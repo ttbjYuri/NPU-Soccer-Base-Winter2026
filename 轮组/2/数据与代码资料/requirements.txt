@@ -1,0 +1,15 @@
+# 参考实现 roadseg 的运行依赖
+# 安装：pip install -r requirements.txt
+#
+# 没有 GPU 时先装 CPU 版 torch（体积小很多）：
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+torch>=2.0
+numpy>=1.24
+PyYAML>=6.0
+
+# 仅 visualize.py 需要（画点云预测图）；不跑可视化可以不装
+matplotlib>=3.7
+
+# 跑单元测试需要（附录 C.7 的自检清单要求 python -m pytest tests -q）
+pytest>=7.0

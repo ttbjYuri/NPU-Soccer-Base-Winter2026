@@ -1,0 +1,42 @@
+# PointNet 基线配置（题目"二、基线模型要求"的参照实现）
+# 用法：python train.py --config configs/pointnet.yaml
+
+exp_name: pointnet
+output_dir: runs
+
+model:
+  name: pointnet
+  num_classes: 5
+  in_channels: 3
+  use_input_transform: false      # T-Net 默认关：见 roadseg/models/pointnet.py 的取舍说明
+  use_feature_transform: false
+  local_dim: 64
+  global_dim: 1024
+  dropout: 0.3
+
+data:
+  root: data/course
+  num_points: 4096                # 训练每帧采样点数（显存不足就降到 2048）
+  ignore_index: 255
+  augment:
+    rotate_z: true                # 绕 z 轴任意旋转：场景没有固定朝向
+    random_drop_ratio: 0.30       # 随机丢 30% 的点 → 与"稀疏"退化同源
+    jitter_std: 0.01              # 1cm 高斯噪声 → 与"坐标噪声"同源
+    scale_range: null             # 不做缩放：会改变噪声的物理量纲
+    # 训练侧不做"局部挖空/离群点"增强——那属于改进方向，不是基线的一部分。
+    # 如果做了，必须在报告里写清楚，否则基线就不公平了。
+
+train:
+  batch_size: 8
+  epochs: 120
+  lr: 0.001
+  weight_decay: 0.0001
+  lr_schedule: cosine
+  grad_clip: 1.0
+  eval_every: 5
+  seed: 0
+
+eval:
+  num_points: 8192                # 评测采样点数；为 null 表示整帧全量（最老实，但慢）
+  # 评测档位见 roadseg/degradation.py 的 standard_suite()，共 14 档
+

@@ -1,0 +1,44 @@
+# 消融 A：去掉相对位置编码（K/V/偏置都不含 Δxyz），用来证明收益来自位置信息
+# 用法：python train.py --config configs/rpa_no_rpe.yaml
+
+exp_name: rpa_no_rpe
+output_dir: runs
+
+model:
+  name: rpa
+  num_classes: 5
+  in_channels: 3
+  local_dim: 64
+  global_dim: 1024
+  k: 16
+  num_blocks: 2
+  num_heads: 4
+  r_max: 4.0
+  use_rpe: false
+  agg: attn
+  global_pool: max
+  dropout: 0.3
+
+data:
+  root: data/course
+  num_points: 4096
+  ignore_index: 255
+  augment:
+    rotate_z: true
+    random_drop_ratio: 0.30
+    jitter_std: 0.01
+    scale_range: null
+
+train:
+  batch_size: 8
+  epochs: 120
+  lr: 0.001
+  weight_decay: 0.0001
+  lr_schedule: cosine
+  grad_clip: 1.0
+  eval_every: 5
+  seed: 0
+
+eval:
+  num_points: 8192          # 每帧评测采样点数；null 表示跟训练侧一致
+
